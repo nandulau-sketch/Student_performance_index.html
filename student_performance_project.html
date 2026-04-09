@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Performance Analysis – Unnathi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #222; }
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white; padding: 48px 40px; text-align: center;
+  }
+  .header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 10px; }
+  .header p { font-size: 1.05rem; opacity: 0.85; margin-bottom: 20px; }
+  .badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); padding: 5px 14px; border-radius: 20px; font-size: 0.82rem; color: #fff; }
+  .container { max-width: 900px; margin: 40px auto; padding: 0 20px 60px; }
+  .section-title { font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #0f3460; border-left: 4px solid #0f3460; padding-left: 12px; margin: 36px 0 18px; }
+  .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .stat-card { background: white; border-radius: 10px; padding: 22px 18px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border-top: 3px solid #0f3460; }
+  .stat-card .number { font-size: 2rem; font-weight: 800; color: #0f3460; }
+  .stat-card .label { font-size: 0.82rem; color: #666; margin-top: 4px; }
+  .step { display: flex; background: white; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #e8ecf0; }
+  .step-number { background: #0f3460; color: white; min-width: 64px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; }
+  .step-content { padding: 18px 22px; flex: 1; }
+  .step-content h3 { font-size: 1rem; font-weight: 700; color: #0f3460; margin-bottom: 8px; }
+  .step-content p { font-size: 0.9rem; color: #444; line-height: 1.65; }
+  .step-content ul { margin-top: 8px; padding-left: 18px; }
+  .step-content ul li { font-size: 0.88rem; color: #555; margin-bottom: 4px; line-height: 1.55; }
+  .step-tag { display: inline-block; background: #e8f0fe; color: #0f3460; font-size: 0.75rem; font-weight: 600; padding: 2px 10px; border-radius: 12px; margin-top: 8px; margin-right: 5px; }
+  .insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .insight-card { background: white; border-radius: 10px; padding: 18px 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-left: 4px solid #0f3460; }
+  .insight-card .icon { font-size: 1.5rem; margin-bottom: 8px; }
+  .insight-card h4 { font-size: 0.9rem; font-weight: 700; color: #222; margin-bottom: 6px; }
+  .insight-card p { font-size: 0.85rem; color: #555; line-height: 1.55; }
+  .tech-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .tech-pill { background: white; border: 2px solid #0f3460; color: #0f3460; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+  .objective-box { background: white; border-radius: 10px; padding: 20px 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-left: 4px solid #0f3460; }
+  .objective-box p { font-size: 0.92rem; color: #333; line-height: 1.7; }
+  .linkedin-box { background: white; border-radius: 12px; padding: 24px 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1px solid #e0e7ff; }
+  .linkedin-box h3 { font-size: 0.95rem; font-weight: 700; color: #0f3460; margin-bottom: 12px; }
+  .linkedin-box p { font-size: 0.9rem; color: #333; line-height: 1.7; background: #f8f9ff; padding: 14px 16px; border-radius: 8px; border-left: 3px solid #0f3460; }
+  .footer { background: #1a1a2e; color: rgba(255,255,255,0.7); text-align: center; padding: 24px; font-size: 0.85rem; margin-top: 40px; }
+  .footer a { color: #7eb8f7; text-decoration: none; }
+  code { background: #f0f4ff; color: #0f3460; padding: 1px 6px; border-radius: 4px; font-size: 0.85rem; font-family: monospace; }
+  @media(max-width:600px) { .header h1 { font-size: 1.5rem; } .step-number { min-width: 48px; font-size: 1.2rem; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 Student Performance Analysis</h1>
+  <p>Exploratory Data Analysis + Machine Learning Prediction &nbsp;|&nbsp; Python &nbsp;|&nbsp; Kaggle Dataset</p>
+  <div class="badges">
+    <span class="badge">🐍 Python</span>
+    <span class="badge">📈 EDA</span>
+    <span class="badge">🤖 Linear Regression</span>
+    <span class="badge">📊 Scikit-Learn</span>
+    <span class="badge">🎨 Matplotlib &amp; Seaborn</span>
+    <span class="badge">🗂️ Pandas</span>
+    <span class="badge">🔢 NumPy</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="section-title">Project Overview</div>
+  <div class="overview-grid">
+    <div class="stat-card"><div class="number">1,000+</div><div class="label">Student Records Analyzed</div></div>
+    <div class="stat-card"><div class="number">6</div><div class="label">Key Features Selected</div></div>
+    <div class="stat-card"><div class="number">7</div><div class="label">Steps Completed</div></div>
+    <div class="stat-card"><div class="number">1</div><div class="label">ML Model Built</div></div>
+  </div>
+
+  <div class="section-title">Objective</div>
+  <div class="objective-box">
+    <p>To analyze the factors that influence student academic performance using Exploratory Data Analysis (EDA), and to build a Linear Regression model that predicts a student's final score based on behavioral, academic, and lifestyle attributes from a Kaggle dataset.</p>
+  </div>
+
+  <div class="section-title">Project Steps — Complete Sequence</div>
+
+  <div class="step">
+    <div class="step-number">1</div>
+    <div class="step-content">
+      <h3>Dataset Loading</h3>
+      <p>Loaded the student performance dataset from Kaggle using Python Pandas. The dataset contains academic, behavioral, and lifestyle attributes across 1,000+ student records with multiple feature columns representing different aspects of student life and learning habits.</p>
+      <span class="step-tag">Pandas</span><span class="step-tag">CSV Load</span><span class="step-tag">Kaggle Dataset</span>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-number">2</div>
+    <div class="step-content">
+      <h3>Initial Data Exploration</h3>
+      <p>Explored dataset structure, data types, null values, and statistical summaries to understand the data before analysis. Key functions used:</p>
+      <ul>
+        <li><code>head()</code> — Preview the first few rows of the dataset</li>
+        <li><code>shape()</code> — Check total number of rows and columns</li>
+        <li><code>info()</code> — Review data types and identify missing values</li>
+        <li><code>describe()</code> — Generate statistical summary (mean, std, min, max)</li>
+      </ul>
+      <span class="step-tag">Data Profiling</span><span class="step-tag">EDA</span>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-number">3</div>
+    <div class="step-content">
+      <h3>Feature Selection</h3>
+      <p>Identified and selected 6 key attributes most likely to impact student final scores, used as input features for the prediction model:</p>
+      <ul>
+        <li><code>previous_score</code> — Prior academic performance</li>
+        <li><code>attendance_percentage</code> — Class attendance rate</li>
+        <li><code>daily_study_hours</code> — Average daily study time</li>
+        <li><code>math_prev_score</code> — Previous Mathematics score</li>
+        <li><code>science_prev_score</code> — Previous Science score</li>
+        <li><code>language_prev_score</code> — Previous Language score</li>
+      </ul>
+      <span class="step-tag">Feature Engineering</span><span class="step-tag">Scikit-Learn</span>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-number">4</div>
+    <div class="step-content">
+      <h3>Exploratory Data Analysis (EDA)</h3>
+      <p>Computed a correlation matrix across all numerical columns to identify relationships between features. Generated a Seaborn heatmap to visually observe which variables have the strongest positive or negative correlation with the final score — helping prioritize the most influential features for the model.</p>
+      <span class="step-tag">Correlation Matrix</span><span class="step-tag">Seaborn Heatmap</span><span class="step-tag">NumPy</span>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-number">5</div>
+    <div class="step-content">
+      <h3>Data Visualization</h3>
+      <p>Created multiple visualizations to analyze how different factors influence student performance:</p>
+      <ul>
+        <li><strong>Regression Plot</strong> — Previous score vs. Final score relationship</li>
+        <li><strong>Regression Plot</strong> — Attendance percentage vs. Final score relationship</li>
+        <li><strong>Boxplot</strong> — Impact of study environment on overall academic performance</li>
+      </ul>
+      <span class="step-tag">Matplotlib</span><span class="step-tag">Seaborn</span><span class="step-tag">Regression Plots</span><span class="step-tag">Boxplots</span>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-number">6</div>
+    <div class="step-content">
+      <h3>Machine Learning — Linear Regression Model</h3>
+      <p>Built a Linear Regression model using Scikit-Learn to predict each student's <strong>final_score</strong> based on the 6 selected features. Split the dataset into training and testing sets, trained the model on historical data, and evaluated prediction performance using standard regression metrics.</p>
+      <span class="step-tag">Linear Regression</span><span class="step-tag">Scikit-Learn</span><span class="step-tag">Train/Test Split</span><span class="step-tag">Predictive Modeling</span>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-number">7</div>
+    <div class="step-content">
+      <h3>Insights &amp; Conclusions</h3>
+      <p>Identified the following key patterns from the analysis to support data-driven recommendations for improving student academic outcomes:</p>
+      <ul>
+        <li>Previous academic scores and attendance percentage showed the <strong>strongest positive impact</strong> on final performance</li>
+        <li>Daily study hours had a <strong>moderate positive correlation</strong> with final score</li>
+        <li>Study environment had a <strong>significant influence</strong> on overall academic performance</li>
+        <li>Students with consistent study habits consistently outperformed peers with irregular patterns</li>
+      </ul>
+      <span class="step-tag">Business Insights</span><span class="step-tag">Recommendations</span>
+    </div>
+  </div>
+
+  <div class="section-title">Key Findings</div>
+  <div class="insights-grid">
+    <div class="insight-card">
+      <div class="icon">📚</div>
+      <h4>Previous Scores Matter Most</h4>
+      <p>Prior academic performance was the strongest predictor of final scores, showing that consistent past performance strongly predicts future outcomes.</p>
+    </div>
+    <div class="insight-card">
+      <div class="icon">🏫</div>
+      <h4>Attendance is Critical</h4>
+      <p>Higher attendance percentage was directly linked to better final scores across all subjects and student demographics in the dataset.</p>
+    </div>
+    <div class="insight-card">
+      <div class="icon">⏰</div>
+      <h4>Study Hours Impact Performance</h4>
+      <p>Daily study hours showed a moderate positive correlation with final scores, reinforcing the value of consistent and structured study habits.</p>
+    </div>
+    <div class="insight-card">
+      <div class="icon">🏠</div>
+      <h4>Study Environment Matters</h4>
+      <p>Students in a favorable and distraction-free study environment consistently outperformed those in less conducive learning settings.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Technologies &amp; Tools Used</div>
+  <div class="tech-grid">
+    <span class="tech-pill">Python</span>
+    <span class="tech-pill">Pandas</span>
+    <span class="tech-pill">NumPy</span>
+    <span class="tech-pill">Matplotlib</span>
+    <span class="tech-pill">Seaborn</span>
+    <span class="tech-pill">Scikit-Learn</span>
+    <span class="tech-pill">Linear Regression</span>
+    <span class="tech-pill">EDA</span>
+    <span class="tech-pill">Kaggle Dataset</span>
+    <span class="tech-pill">Jupyter Notebook</span>
+  </div>
+
+  <div class="section-title">LinkedIn / Resume Description — Ready to Copy</div>
+  <div class="linkedin-box">
+    <h3>📋 Copy and paste this directly into your LinkedIn Projects section:</h3>
+    <p>Performed exploratory data analysis and built a Linear Regression model using Python (Pandas, Scikit-Learn, Seaborn, Matplotlib) on a Kaggle student performance dataset of 1,000+ records. Analyzed 6 key features including previous scores, attendance percentage, and daily study hours to predict final academic performance. Generated correlation heatmaps, regression plots, and boxplots to visualize performance trends — identifying that previous academic scores and attendance percentage have the strongest impact on student final scores.</p>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>
+    Project by <strong style="color:white;">Unnathi</strong> &nbsp;|&nbsp;
+    Data Engineer &amp; Data Analyst &nbsp;|&nbsp;
+    San Francisco, CA &nbsp;|&nbsp;
+    <a href="https://www.linkedin.com/in/nsai56" target="_blank">LinkedIn Profile</a>
+  </p>
+</div>
+
+</body>
+</html>
